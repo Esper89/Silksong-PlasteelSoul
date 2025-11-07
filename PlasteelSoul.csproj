@@ -4,7 +4,7 @@
         <Authors>Esper89</Authors>
         <RootNamespace>PlasteelSoul</RootNamespace>
         <AssemblyTitle>Plasteel Soul</AssemblyTitle>
-        <Version>1.0.0</Version>
+        <Version>1.1.0</Version>
         <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
     </PropertyGroup>
     <PropertyGroup>
@@ -88,6 +88,7 @@
         <ItemGroup>
             <ThunderstoreFiles Include="thunderstore/manifest.json"/>
             <ThunderstoreFiles Include="thunderstore/README.md"/>
+            <ThunderstoreFiles Include="thunderstore/CHANGELOG.md"/>
             <ThunderstoreFiles Include="thunderstore/icon.png"/>
         </ItemGroup>
         <Copy

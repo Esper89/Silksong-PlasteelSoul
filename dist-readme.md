@@ -1,4 +1,4 @@
-# Plasteel Soul v1.0.0
+# Plasteel Soul v1.1.0
 
 Plasteel Soul is a Silksong mod that lets you access Steel Soul-exclusive game content outside of
 Steel Soul mode.

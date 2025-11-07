@@ -12,11 +12,11 @@
           "HarmonyX": "2.7.0"
         }
       },
-      "BepInEx.PluginInfoProps": {
+      "Hamunii.BepInEx.AutoPlugin": {
         "type": "Direct",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "RqM3aaGs8Hc2m0D+8aSt9mv09rCMYNIF35NB3D6KA2zSpcXJh/9ZVWrPlIUJfA8KYzodSWcCMUexEW24fjwR3w=="
+        "requested": "[2.0.*, )",
+        "resolved": "2.0.1",
+        "contentHash": "UDVQtYOGU1v+xkYIRubm4zSIRtCW42kWgJ3sXIbqYSD1qSseH9gU44+zQMNRCy3BYXITtwWE3RqoyJdWUjDASA=="
       },
       "HarmonyX": {
         "type": "Direct",

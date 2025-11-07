@@ -7,59 +7,50 @@ using HarmonyLib;
 
 namespace PlasteelSoul;
 
-[BepInPlugin(PluginInfo.PLUGIN_GUID, "Plasteel Soul", PluginInfo.PLUGIN_VERSION)]
-class Mod : BaseUnityPlugin
+[BepInAutoPlugin]
+[BepInDependency("org.silksong-modding.i18n")]
+sealed partial class Mod : BaseUnityPlugin
 {
     void Awake()
     {
         Mod._instance = this;
-
-        this._accessSteelWish = base.Config.Bind(
-            "General", "AccessSteelWish", true,
-            "Allow access to the Steel Soul-exclusive wish in non-Steel Soul mode"
-        );
-        this._sellShellSatchel = base.Config.Bind(
-            "General", "SellShellSatchel", true,
-            "Allow purchasing the Shell Satchel from Jubilana in non-Steel Soul mode"
-        );
-        this._accessSkynx = base.Config.Bind(
-            "General", "AccessSkynx", true,
-            "Allow access to Skynx to sell Silkeaters in non-Steel Soul mode"
-        );
-        this._paintBellhomeChrome = base.Config.Bind(
-            "General", "PaintBellhomeChrome", true,
-            "Allow painting the Bellhome with the Chrome Bell Lacquer in non-Steel Soul mode"
-        );
-
-        var harmony = new Harmony(PluginInfo.PLUGIN_GUID);
-        harmony.PatchAll();
-
-        var sceneLoaded = false;
-        UnityEngine.SceneManagement.SceneManager.sceneLoaded += (_, _) =>
-        {
-            if (!sceneLoaded)
-            {
-                sceneLoaded = true;
-                I18n.PatchOnSceneLoad(harmony);
-            }
-        };
+        this._config = new(base.Config);
+        new Harmony(Mod.Id).PatchAll();
     }
 
     static Mod? _instance = null;
-    static Mod Instance => Mod._instance ??
-        throw new NullReferenceException("Mod method called before Awake");
+    static Mod Instance => Mod._instance ? Mod._instance :
+        throw new NullReferenceException($"{nameof(Mod)} accessed before {nameof(Awake)}");
 
-    ConfigEntry<bool>? _accessSteelWish = null;
-    internal static bool AccessSteelWish => Mod.Instance._accessSteelWish!.Value;
+    ConfigEntries? _config = null;
+    new internal static ConfigEntries Config => Mod.Instance._config!;
 
-    ConfigEntry<bool>? _sellShellSatchel = null;
-    internal static bool SellShellSatchel => Mod.Instance._sellShellSatchel!.Value;
+    internal sealed class ConfigEntries(ConfigFile file)
+    {
+        internal bool AccessSteelWish => this._accessSteelWish.Value;
+        ConfigEntry<bool> _accessSteelWish = file.Bind(
+            "General", "AccessSteelWish", true,
+            "Allow access to the Steel Soul-exclusive wish in non-Steel Soul mode"
+        );
 
-    ConfigEntry<bool>? _accessSkynx = null;
-    internal static bool AccessSkynx => Mod.Instance._accessSkynx!.Value;
+        internal bool SellShellSatchel => this._sellShellSatchel.Value;
+        ConfigEntry<bool> _sellShellSatchel = file.Bind(
+            "General", "SellShellSatchel", true,
+            "Allow purchasing the Shell Satchel from Jubilana in non-Steel Soul mode"
+        );
 
-    ConfigEntry<bool>? _paintBellhomeChrome = null;
-    internal static bool PaintBellhomeChrome => Mod.Instance._paintBellhomeChrome!.Value;
+        internal bool AccessSkynx => this._accessSkynx.Value;
+        ConfigEntry<bool> _accessSkynx = file.Bind(
+            "General", "AccessSkynx", true,
+            "Allow access to Skynx to sell Silkeaters in non-Steel Soul mode"
+        );
+
+        internal bool PaintBellhomeChrome => this._paintBellhomeChrome.Value;
+        ConfigEntry<bool> _paintBellhomeChrome = file.Bind(
+            "General", "PaintBellhomeChrome", true,
+            "Allow painting the Bellhome with the Chrome Bell Lacquer in non-Steel Soul mode"
+        );
+    }
 
     internal static void LogDebug(object msg) => Mod.Instance.Logger.LogDebug(msg);
     internal static void LogInfo(object msg) => Mod.Instance.Logger.LogInfo(msg);
@@ -100,7 +91,7 @@ static class AccessSteelWish
             if (
                 AccessSteelWish.runningEvaluations > 0 &&
                 __instance.FieldName == "permadeathMode" &&
-                Mod.AccessSteelWish
+                Mod.Config.AccessSteelWish
             )
             {
 			    float val = __instance.IntValue;
@@ -124,9 +115,9 @@ static class SellShellSatchel
     static ShopItem CreateItem()
     {
         var item = (ShopItem)ScriptableObject.CreateInstance(typeof(ShopItem));
-        item.name = $"Mods.{PluginInfo.PLUGIN_GUID}.{nameof(JubilanaShopShellSatchel)}";
+        item.name = $"Mods.{Mod.Id}.{nameof(JubilanaShopShellSatchel)}";
         item.displayName = new("Tools", "SHELL_SATCHEL_NAME");
-        item.description = I18n.Key("JUBILANA_SHOP_SHELL_SATCHEL_DESC");
+        item.description = new($"Mods.{Mod.Id}", "JUBILANA_SHOP_SHELL_SATCHEL_DESC");
         item.cost = 290;
         item.savedItem = GlobalSettings.Gameplay.ShellSatchelTool;
 	    item.questsAppearConditions = [];
@@ -196,7 +187,7 @@ static class SellShellSatchel
         {
             if (
                 __instance.name == SellShellSatchel.JubilanaShopShellSatchel.name &&
-                !Mod.SellShellSatchel
+                !Mod.Config.SellShellSatchel
             ) __result = false;
         }
     }
@@ -212,7 +203,7 @@ static class AccessSkynx
             if (
                 __instance.gameObject.scene.name == "Dust_11" &&
                 __instance.name == "Steel Soul States" &&
-                Mod.AccessSkynx
+                Mod.Config.AccessSkynx
             )
             {
                 var steelSoulStates = __instance.transform;
@@ -267,7 +258,7 @@ static class PaintBellhomeChrome
         static void Postfix(PlayerDataTest __instance, ref bool __result)
         {
             if (
-                Mod.PaintBellhomeChrome &&
+                Mod.Config.PaintBellhomeChrome &&
                 PaintBellhomeChrome.bellhomePaintConditions.TryGetValue(__instance, out _)
             ) __result = true;
         }

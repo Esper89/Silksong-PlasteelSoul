@@ -1,9 +1,12 @@
+# Plasteel Soul
+
 Plasteel Soul lets you access Steel Soul-exclusive game content outside of Steel Soul mode.
 
 ## Installation
 
 This mod requires
-[BepInEx 5](https://thunderstore.io/c/hollow-knight-silksong/p/BepInEx/BepInExPack_Silksong), and is
+[BepInEx 5](https://thunderstore.io/c/hollow-knight-silksong/p/BepInEx/BepInExPack_Silksong) and
+[I18N](https://thunderstore.io/c/hollow-knight-silksong/p/silksong_modding/I18N), and is
 installed to your `BepInEx/plugins` directory.
 [Configuration
 Manager](https://thunderstore.io/c/hollow-knight-silksong/p/Yukikaco/BepinExConfigurationManager)

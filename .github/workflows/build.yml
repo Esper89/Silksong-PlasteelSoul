@@ -10,10 +10,8 @@ jobs:
     steps:
     - name: "Checkout Repository"
       uses: actions/checkout@v2
-    - name: "Restore"
-      run: dotnet restore --locked-mode
     - name: "Build"
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build --configuration Release --property CI=true
     - name: "Upload Artifact"
       uses: actions/upload-artifact@v4
       with:

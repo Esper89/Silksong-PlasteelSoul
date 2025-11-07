@@ -4,6 +4,7 @@
     "description": "Access Steel Soul-exclusive game content outside of Steel Soul mode.",
     "website_url": "https://github.com/Esper89/Silksong-PlasteelSoul",
     "dependencies": [
-        "BepInEx-BepInExPack_Silksong-5.4.2303"
+        "BepInEx-BepInExPack_Silksong-5.4.2303",
+        "silksong_modding-I18N-1.0.1"
     ]
 }

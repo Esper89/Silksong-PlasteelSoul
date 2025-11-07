@@ -6,7 +6,8 @@ Steel Soul mode.
 ## Installation
 
 To install Plasteel Soul, place the `PlasteelSoul` folder (containing `PlasteelSoul.dll`) in your
-`BepInEx/plugins` folder.
+`BepInEx/plugins` folder. Make sure you also have the
+[I18N](https://github.com/silksong-modding/Silksong.I18N) mod installed!
 
 ## Usage
 

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Version>1.0.0</Version>
         <Authors>Esper89</Authors>
+        <RootNamespace>PlasteelSoul</RootNamespace>
+        <AssemblyTitle>Plasteel Soul</AssemblyTitle>
+        <Version>1.0.0</Version>
+        <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+    </PropertyGroup>
+    <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>12.0</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -11,33 +16,39 @@
         <GenerateDependencyFile>false</GenerateDependencyFile>
         <DebugType>embedded</DebugType>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <AssemblyName>$(Authors).$(RootNamespace)</AssemblyName>
+        <RepositoryUrl>https://github.com/$(Authors)/Silksong-$(RootNamespace)</RepositoryUrl>
+        <NeutralLanguage>EN</NeutralLanguage>
         <RestoreAdditionalProjectSources>
             https://nuget.bepinex.dev/v3/index.json
         </RestoreAdditionalProjectSources>
-        <BepInExPluginGuid>$(Authors).$(RootNamespace)</BepInExPluginGuid>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <PathMap>$(MSBuildProjectDirectory)=[repo]</PathMap>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
+        <PathMap Condition="'$(Configuration)' == 'Release'">
+            $(MSBuildProjectDirectory)=./
+        </PathMap>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="UnityEngine.Modules" Version="6000.0.50"/>
         <PackageReference Include="Silksong.GameLibs" Version="*-*"/>
         <PackageReference Include="BepInEx.Core" Version="5.4.21"/>
-        <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0"/>
+        <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.*" PrivateAssets="all"/>
         <PackageReference Include="HarmonyX" Version="2.9.0"/>
-        <Content Include="LICENSE" CopyToOutputDirectory="Always"/>
-        <Content Include="dist-readme.md" Link="README.md" CopyToOutputDirectory="Always"/>
-        <Content Include="languages/**" CopyToOutputDirectory="Always"/>
     </ItemGroup>
-    <Target Name="LoadTargetFiles" AfterTargets="PostBuildEvent">
-        <CreateItem Include="$(TargetDir)/**">
-            <Output TaskParameter="Include" ItemName="TargetFiles"/>
-        </CreateItem>
+    <ItemGroup>
+        <Content Include="LICENSE" CopyToOutputDirectory="PreserveNewest"/>
+        <Content Include="dist-readme.md" Link="README.md" CopyToOutputDirectory="PreserveNewest"/>
+        <Content Include="languages/**" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+    <Target Name="SetupTargetFiles" AfterTargets="PostBuildEvent">
+        <Move SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)/$(RootNamespace).dll"/>
+        <ItemGroup>
+            <TargetFiles Include="$(TargetDir)/**"/>
+        </ItemGroup>
     </Target>
     <Target
         Name="LoadGameDirs"
-        AfterTargets="LoadTargetFiles"
+        AfterTargets="SetupTargetFiles"
         Condition="'$(Configuration)' == 'Debug' And Exists('game-dirs.txt')"
     >
         <ReadLinesFromFile File="game-dirs.txt">
@@ -49,41 +60,43 @@
         AfterTargets="LoadGameDirs"
         Condition="'$(Configuration)' == 'Debug' And Exists('game-dirs.txt')"
         Inputs="@(GameDirs);@(TargetFiles)"
-        Outputs="%(GameDirs.Identity)/BepInEx/plugins/$(ProjectName)/**"
+        Outputs="%(GameDirs.Identity)/BepInEx/plugins/$(RootNamespace)/**"
     >
-        <CreateProperty Value="%(GameDirs.Identity)">
-            <Output TaskParameter="Value" PropertyName="GameDir"/>
-        </CreateProperty>
+        <PropertyGroup>
+            <GameDir>%(GameDirs.Identity)</GameDir>
+        </PropertyGroup>
         <Copy
             SourceFiles="@(TargetFiles)"
-            DestinationFolder="$(GameDir)/BepInEx/plugins/$(ProjectName)/%(RecursiveDir)"
+            DestinationFolder="$(GameDir)/BepInEx/plugins/$(RootNamespace)/%(RecursiveDir)"
         />
     </Target>
     <Target
         Name="ZipDist"
-        AfterTargets="LoadTargetFiles"
+        AfterTargets="SetupTargetFiles"
         Condition="'$(Configuration)' == 'Release'"
     >
         <RemoveDir Directories="target/dist"/>
         <Copy
             SourceFiles="@(TargetFiles)"
-            DestinationFolder="target/dist/$(ProjectName)/%(RecursiveDir)"
+            DestinationFolder="target/dist/plugins/$(RootNamespace)/%(RecursiveDir)"
         />
         <ZipDirectory
-            SourceDirectory="target/dist"
-            DestinationFile="target/$(ProjectName).zip"
+            SourceDirectory="target/dist/plugins"
+            DestinationFile="target/$(RootNamespace).zip"
             Overwrite="True"
         />
-        <CreateItem Include="thunderstore/**">
-            <Output TaskParameter="Include" ItemName="ThunderstoreFiles"/>
-        </CreateItem>
+        <ItemGroup>
+            <ThunderstoreFiles Include="thunderstore/manifest.json"/>
+            <ThunderstoreFiles Include="thunderstore/README.md"/>
+            <ThunderstoreFiles Include="thunderstore/icon.png"/>
+        </ItemGroup>
         <Copy
             SourceFiles="@(ThunderstoreFiles)"
             DestinationFolder="target/dist/%(RecursiveDir)"
         />
         <ZipDirectory
             SourceDirectory="target/dist"
-            DestinationFile="target/$(Authors)-$(ProjectName)-$(Version).zip"
+            DestinationFile="target/$(Authors)-$(RootNamespace)-$(Version).zip"
             Overwrite="True"
         />
         <RemoveDir Directories="target/dist"/>
